@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#09090b">
+  <meta name="description" content="Dicionário — palavras para aquilo que você sente, pensa e vive.">
+  <title>Dicionário — talvez exista uma palavra</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    (() => {
+      const path = location.pathname;
+      const marker = /\/(?:palavras|categoria)(?:\/|$)|\/sobre(?:\/|$)/.exec(path);
+      let base;
+      if (location.protocol === 'file:') {
+        base = new URL('./', location.href).href;
+      } else if (marker) {
+        base = location.origin + path.slice(0, marker.index) + '/';
+      } else {
+        base = location.origin + path.slice(0, path.lastIndexOf('/') + 1);
+      }
+      document.write('<link rel="stylesheet" href="' + base + 'styles.css">');
+      window.__DICIONARIO_BASE__ = base;
+    })();
+  </script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar" aria-label="Navegação principal">
+      <div class="sidebar-top">
+        <a class="brand" href="#/" data-nav="home" aria-label="Dicionário, início">
+          <span class="brand-mark">d</span>
+          <span>Dicionário</span>
+        </a>
+        <button class="mobile-close" id="closeSidebar" aria-label="Fechar menu">×</button>
+      </div>
+
+      <label class="search-box" for="globalSearch">
+        <span class="search-icon">⌕</span>
+        <input id="globalSearch" type="search" autocomplete="off" spellcheck="false" placeholder="Buscar uma palavra…">
+        <kbd>⌘ K</kbd>
+      </label>
+
+      <nav class="sidebar-nav" id="sidebarNav"></nav>
+
+      <div class="sidebar-footer">
+        <a href="#/sobre" data-nav="about">Sobre</a>
+        <span class="dot-sep">·</span>
+        <span id="wordCountSmall">0 palavras</span>
+      </div>
+    </aside>
+
+    <div class="mobile-backdrop" id="mobileBackdrop"></div>
+
+    <main class="main" id="main">
+      <header class="mobile-header">
+        <button id="openSidebar" class="menu-button" aria-label="Abrir menu">☰</button>
+        <a href="#/" data-nav="home" class="mobile-brand">Dicionário</a>
+      </header>
+
+      <div class="content-wrap" id="content"></div>
+    </main>
+  </div>
+
+  <div class="search-palette hidden" id="searchPalette" role="dialog" aria-modal="true" aria-label="Busca">
+    <div class="palette-backdrop" data-close-search></div>
+    <section class="palette">
+      <div class="palette-head">
+        <span>Buscar no dicionário</span>
+        <button data-close-search aria-label="Fechar busca">Esc</button>
+      </div>
+      <input id="paletteSearch" type="search" placeholder="Ex.: sentir falta de algo que acabou" autocomplete="off">
+      <div id="paletteResults" class="palette-results"></div>
+    </section>
+  </div>
+
+  <div id="toast" class="toast" aria-live="polite"></div>
+  <script>document.write('<script src="' + window.__DICIONARIO_BASE__ + 'data.js"><\/script>');</script>
+  <script>document.write('<script src="' + window.__DICIONARIO_BASE__ + 'app.js"><\/script>');</script>
+</body>
+</html>

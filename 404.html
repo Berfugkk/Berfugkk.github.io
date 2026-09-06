@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dicionário</title>
+</head>
+<body>
+  <script>
+    (function () {
+      // GitHub Pages does not natively rewrite SPA routes. Preserve the requested
+      // path after the repository root and let the application read it from hash.
+      var path = location.pathname.replace(/^\/+/, '');
+      var parts = path.split('/');
+      var root = parts.length > 1 ? '/' + parts[0] + '/' : '/';
+      var rest = parts.length > 1 ? parts.slice(1).join('/') : '';
+      if (rest) {
+        location.replace(location.origin + root + '#/' + rest + location.search);
+      } else {
+        location.replace(location.origin + root);
+      }
+    })();
+  </script>
+</body>
+</html>
