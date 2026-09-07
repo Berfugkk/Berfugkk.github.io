@@ -35,10 +35,15 @@
 
   const APP_BASE = window.__DICIONARIO_BASE__ || new URL('./', location.href).href;
   const isFile = location.protocol === 'file:';
+  const isGitHubPages = /(?:^|\.)github\.io$/i.test(location.hostname);
 
   function hrefFor(id) {
     const path = `palavras/${encodeURIComponent(id)}`;
-    return isFile ? `#/${path}` : new URL(path, APP_BASE).pathname + new URL(path, APP_BASE).search + new URL(path, APP_BASE).hash;
+    // GitHub Pages does not rewrite clean SPA routes. Use hash URLs there so
+    // category/word navigation never depends on a server-side 404 fallback.
+    if (isFile || isGitHubPages) return `#/${path}`;
+    const url = new URL(path, APP_BASE);
+    return url.pathname + url.search + url.hash;
   }
   function navigate(id) {
     const target = hrefFor(id);
@@ -64,7 +69,7 @@
 
   function categoryHref(category) {
     const path = `categoria/${encodeURIComponent(category)}`;
-    if (isFile) return `#/${path}`;
+    if (isFile || isGitHubPages) return `#/${path}`;
     const url = new URL(path, APP_BASE);
     return url.pathname + url.search + url.hash;
   }

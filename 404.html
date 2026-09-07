@@ -11,9 +11,11 @@
       // GitHub Pages does not natively rewrite SPA routes. Preserve the requested
       // path after the repository root and let the application read it from hash.
       var path = location.pathname.replace(/^\/+/, '');
-      var parts = path.split('/');
-      var root = parts.length > 1 ? '/' + parts[0] + '/' : '/';
-      var rest = parts.length > 1 ? parts.slice(1).join('/') : '';
+      var parts = path.split('/').filter(Boolean);
+      var first = parts[0] || '';
+      var isUserSiteRoute = ['palavras', 'categoria', 'sobre'].indexOf(first) !== -1;
+      var root = isUserSiteRoute ? '/' : (parts.length > 1 ? '/' + first + '/' : '/');
+      var rest = isUserSiteRoute ? parts.join('/') : (parts.length > 1 ? parts.slice(1).join('/') : '');
       if (rest) {
         location.replace(location.origin + root + '#/' + rest + location.search);
       } else {

@@ -84,4 +84,4 @@ O projeto é estático e inclui `404.html` para preservar as rotas de palavras q
 2. Em **Settings → Pages**, selecione a branch e a pasta publicada.
 3. Aguarde a publicação.
 
-As URLs continuam navegáveis no GitHub Pages; em acessos diretos o `404.html` converte a rota para o fallback interno da aplicação.
+No GitHub Pages, a interface usa URLs com hash (`#/palavras/saudade`, `#/categoria/Sentimentos`) para evitar o 404 de SPA. O `404.html` também converte acessos diretos a rotas antigas/limpas para o fallback interno.
