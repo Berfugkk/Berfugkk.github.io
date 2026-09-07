@@ -1,3 +1,7 @@
+Dicionário — catálogo estático
+
+Este projeto agora inclui 3.502 entradas em 17 categorias. As primeiras entradas são o núcleo curado; a camada adicional amplia o catálogo com conceitos descritivos marcados como tal para não fingir que toda expressão é um lema fixo do idioma.
+
 # Dicionário
 
 Um dicionário exploratório em português brasileiro para sentimentos, emoções, estados mentais, relações humanas, experiências, sensações, memória, tempo, comportamentos e conceitos difíceis de explicar.

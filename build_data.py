@@ -1,4 +1,6 @@
 import json
+import re
+import unicodedata
 from pathlib import Path
 
 # Curated first edition: fewer entries than the previous synthetic catalog,
@@ -485,6 +487,98 @@ META = {
 "Afetos sociais":"Sentimentos e avaliações que surgem na presença, no julgamento e no reconhecimento dos outros.",
 }
 
+
+# Large second layer: descriptive concepts. These are intentionally marked as
+# "conceito descritivo" rather than pretending every collocation is a fixed
+# dictionary lemma. They broaden discovery without replacing the curated core.
+SUPPLEMENTAL = {
+"Sentimentos": {
+"bases": ["alegria","tristeza","medo","culpa","vergonha","orgulho","raiva","ternura","esperança","alívio","frustração","gratidão","inveja","admiração","solidariedade"],
+"mods": ["discreta","repentina","persistente","difusa","contida","intensa","ambígua","recorrente","silenciosa","compartilhada","tardia","contraditória"],
+"extra": "calma possível"
+},
+"Amor & atração": {
+"bases": ["atração","desejo","paixão","afeição","intimidade","cuidado","admiração","reciprocidade","ciúme","flertes","proximidade","distância","encanto","curiosidade","vínculo"],
+"mods": ["inicial","recíproca","não declarada","gradual","intensa","casual","duradoura","frágil","madura","ambivalente","idealizada","correspondida"],
+"extra": "afeição cotidiana"
+},
+"Relações humanas": {
+"bases": ["amizade","confiança","conflito","acordo","desacordo","limite","respeito","lealdade","dependência","autonomia","cuidado","distanciamento","reconciliação","convivência","proximidade"],
+"mods": ["silenciosa","explícita","recente","antiga","recíproca","assimétrica","gradual","inesperada","delicada","tensa","duradoura","provisória"],
+"extra": "confiança negociada"
+},
+"Mente": {
+"bases": ["atenção","memória","imaginação","concentração","percepção","intuição","dúvida","certeza","curiosidade","raciocínio","aprendizado","esquecimento","associação","reação","consciência"],
+"mods": ["seletiva","dispersa","sustentada","automática","deliberada","intuitiva","parcial","retrospectiva","prospectiva","involuntária","metódica","instável"],
+"extra": "atenção flutuante"
+},
+"Sensações": {
+"bases": ["calor","frio","peso","leveza","pressão","formigamento","ardor","coceira","vertigem","tensão","relaxamento","náusea","fadiga","vibração","textura"],
+"mods": ["localizado","difuso","sutil","súbito","persistente","intermitente","profundo","superficial","agradável","incômodo","estranho","familiar"],
+"extra": "sensação residual"
+},
+"Tempo & memória": {
+"bases": ["lembrança","esquecimento","passado","presente","futuro","intervalo","duração","instante","espera","retorno","mudança","repetição","envelhecimento","antecipação","nostalgia"],
+"mods": ["afetiva","fragmentária","recente","distante","lenta","acelerada","cíclica","imprecisa","vívida","tardia","involuntária","reconstruída"],
+"extra": "memória prospectiva"
+},
+"Experiências": {
+"bases": ["descoberta","fracasso","sucesso","surpresa","encontro","perda","mudança","viagem","silêncio","novidade","recomeço","despedida","adaptação","improviso","revelação"],
+"mods": ["inesperada","marcante","breve","transformadora","cotidiana","coletiva","solitária","difícil","agradável","contraditória","memorável","passageira"],
+"extra": "experiência liminar"
+},
+"Palavras raras": {
+"bases": ["inefável","ubiquidade","idiossincrasia","procrastinação","serendipidade","liminaridade","efemeridade","impermanência","saudosismo","sobressalto","circunspecção","comiseração","parcimônia","entreato","inexorável"],
+"mods": ["semântico","cotidiano","literário","filosófico","psicológico","social","afetivo","temporário","metafórico","figurativo","preciso","especializado"],
+"extra": "vocábulo arcaizante"
+},
+"Identidade & pertencimento": {
+"bases": ["identidade","pertencimento","origem","nome","memória","comunidade","família","território","cultura","linguagem","herança","autonomia","alteridade","reconhecimento","diferença"],
+"mods": ["pessoal","coletiva","cultural","familiar","territorial","linguística","negociada","múltipla","fluida","histórica","social","ambivalente"],
+"extra": "identidade situacional"
+},
+"Comportamentos": {
+"bases": ["hábito","hesitação","fuga","aproximação","repetição","improviso","evitação","persistência","adiamento","iniciativa","recuo","imitação","resistência","cooperação","confronto"],
+"mods": ["automático","deliberado","recorrente","ocasional","defensivo","impulsivo","estratégico","social","silencioso","visível","aprendido","adaptativo"],
+"extra": "comportamento reativo"
+},
+"Pensamentos": {
+"bases": ["ideia","hipótese","opinião","lembrança","fantasia","pergunta","conclusão","comparação","analogia","previsão","interpretação","julgamento","decisão","possibilidade","contradição"],
+"mods": ["provisória","recorrente","intuitiva","deliberada","incompleta","complexa","simplificada","retrospectiva","prospectiva","incômoda","surpreendente","resistente"],
+"extra": "pensamento contrafactual"
+},
+"Conceitos difíceis": {
+"bases": ["paradoxo","ambiguidade","causalidade","identidade","liberdade","necessidade","consciência","verdade","realidade","responsabilidade","finitude","incerteza","continuidade","diferença","possibilidade"],
+"mods": ["aparente","profunda","relacional","temporal","lógica","moral","social","subjetiva","objetiva","provisória","inesgotável","controversa"],
+"extra": "causalidade múltipla"
+},
+"Lugar & atmosfera": {
+"bases": ["ambiente","praça","rua","casa","quarto","corredor","janela","esquina","praia","floresta","cidade","bairro","interior","exterior","paisagem"],
+"mods": ["silencioso","movimentado","acolhedor","hostil","vazio","familiar","estranho","luminoso","sombrio","aberto","fechado","transitório"],
+"extra": "atmosfera doméstica"
+},
+"Leitura & linguagem": {
+"bases": ["palavra","frase","voz","texto","metáfora","ironia","subtexto","silêncio","ritmo","ênfase","narrativa","diálogo","imagem","significado","nuance"],
+"mods": ["literal","figurativo","implícito","explícito","coloquial","formal","poético","técnico","ambíguo","subjetivo","narrativo","contextual"],
+"extra": "sentido implícito"
+},
+"Vida cotidiana": {
+"bases": ["rotina","pressa","atraso","descanso","trabalho","estudo","comida","casa","compras","fila","trânsito","mensagem","encontro","tarefa","pausa"],
+"mods": ["matinal","noturna","doméstica","social","repetitiva","inesperada","silenciosa","barulhenta","urgente","adiada","compartilhada","solitária"],
+"extra": "ritual cotidiano"
+},
+"Filosofia da vida": {
+"bases": ["liberdade","finitude","propósito","escolha","responsabilidade","felicidade","virtude","sofrimento","esperança","absurdo","sentido","mudança","tempo","morte","vida"],
+"mods": ["existencial","moral","prática","coletiva","individual","histórica","provisória","radical","cotidiana","trágica","serena","contraditória"],
+"extra": "sentido construído"
+},
+"Afetos sociais": {
+"bases": ["acolhimento","rejeição","validação","aprovação","crítica","elogio","encorajamento","vergonha","admiração","reconhecimento","pressão","solidariedade","confiança","desconfiança","respeito"],
+"mods": ["público","privado","explícito","implícito","recente","antigo","coletivo","individual","sincero","performático","espontâneo","institucional"],
+"extra": "reconhecimento mútuo"
+},
+}
+
 ORDER = list(CATS)
 
 def slug(text):
@@ -497,6 +591,10 @@ def slug(text):
 # then generate navigation connections from the curated corpus.
 entries=[]
 seen={}
+
+# Expand the catalog with compositional concepts. The core remains fully curated;
+# these additional entries are explicitly labeled so users can distinguish them
+# from fixed lemmas and established foreign terms.
 for ci, cat in enumerate(ORDER):
     for wi,(word,typ,definition,recognition) in enumerate(CATS[cat]):
         base=slug(word)
@@ -510,6 +608,65 @@ for ci, cat in enumerate(ORDER):
             'related':[],'contrasts':[],
             'termKind':'termo estrangeiro' if 'termo estrangeiro' in typ else ('termo contemporâneo' if word in {'crush','reframing'} else 'termo do português')
         })
+
+
+# 180 concepts per category + one extra, for 3,077 additions.
+def concept_slug(text):
+    text=unicodedata.normalize('NFD', text)
+    text=''.join(c for c in text if unicodedata.category(c)!='Mn')
+    return re.sub(r'-+','-',re.sub(r'[^a-z0-9]+','-',text.lower()).strip('-'))
+
+def concept_definition(base, mod, cat, variant):
+    patterns=[
+        f"Uma forma mais específica de observar {base}: aqui ele aparece de maneira {mod}, ganhando um contorno que pode passar despercebido quando se usa o termo sozinho.",
+        f"Conceito descritivo usado para falar de {base} quando a experiência é {mod}; a expressão ajuda a nomear a característica sem tratá-la como um fenômeno separado.",
+        f"Variação de {base} marcada por um aspecto {mod}. É útil quando o contexto mostra que não basta dizer apenas {base} para explicar o que aconteceu.",
+        f"Expressão que recorta {base} por sua qualidade {mod}. O sentido depende do contexto, mas a combinação aponta para uma experiência reconhecível e relativamente específica.",
+    ]
+    return patterns[variant % len(patterns)]
+
+def concept_recognition(base, mod, cat, variant):
+    patterns=[
+        f"Você reconhece quando {base} está presente, mas assume uma forma claramente {mod}; algum detalhe da situação faz essa nuance se destacar.",
+        f"Costuma aparecer quando você percebe {base} e, ao mesmo tempo, nota um caráter {mod} na maneira como isso acontece.",
+        f"A pista está menos no nome do fenômeno e mais no modo como ele se manifesta: {base}, porém com uma qualidade {mod}.",
+    ]
+    return patterns[variant % len(patterns)]
+
+supp_count=0
+for ci,cat in enumerate(ORDER):
+    cfg=SUPPLEMENTAL[cat]
+    for bi,base in enumerate(cfg['bases']):
+        for mi,mod in enumerate(cfg['mods']):
+            word=f"{base} {mod}"
+            eid=concept_slug(word)
+            # Keep the human-facing concept unique even when a compound repeats.
+            if eid in seen:
+                eid=f"{eid}-{ci+1}"
+            seen[eid]=word
+            entries.append({
+                'id':eid,
+                'word':word,
+                'type':'locução nominal',
+                'category':cat,
+                'definition':concept_definition(base,mod,cat,bi+mi),
+                'recognition':concept_recognition(base,mod,cat,bi+mi),
+                'related':[],
+                'contrasts':[],
+                'termKind':'conceito descritivo'
+            })
+            supp_count += 1
+    extra=cfg['extra']
+    eid=concept_slug(extra)
+    if eid in seen: eid=f"{eid}-{ci+1}"
+    seen[eid]=extra
+    entries.append({
+        'id':eid,'word':extra,'type':'locução nominal','category':cat,
+        'definition':f"Expressão conceitual usada para recortar uma experiência específica relacionada à categoria {cat.lower()}; o termo ganha sentido pelo contexto em que aparece.",
+        'recognition':f"Você percebe esse conceito quando a situação apresenta uma combinação reconhecível de fatores que não cabe tão bem em uma palavra mais ampla.",
+        'related':[],'contrasts':[],'termKind':'conceito descritivo'
+    })
+print('supplemental added', supp_count+len(ORDER))
 
 by_cat={cat:[e for e in entries if e['category']==cat] for cat in ORDER}
 # Contextual, not random, links: same category neighbors + cross-category anchors.
